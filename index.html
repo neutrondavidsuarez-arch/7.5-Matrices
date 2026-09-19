@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioLearning - Tema 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init({ publicKey: "3LjnpLaDboHWv0VPY" });
+        })();
+    </script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .iframe-container { position: relative; width: 100%; height: 75vh; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .nav-btn { transition: all 0.3s ease; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .nav-btn:hover { transform: translateY(-2px); }
+        .nav-btn.active { border-color: #10b981; color: #10b981; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .dot-pulse { animation: pulse-dot 1.2s infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div class="text-center lg:text-left">
+                    <h1 class="text-xl font-black text-emerald-600 tracking-tight">UNIDAD 5</h1>
+                    <p class="text-slate-500 font-bold text-xs uppercase">Tema 7.5:Matrices</p>
+                </div>
+               
+                <nav class="flex flex-wrap justify-center gap-1 md:gap-4">
+                    <button onclick="prepQuiz('deber', this)" class="nav-btn active px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>🧪</span> Deber
+                    </button>
+                    <button onclick="prepQuiz('evaluacion', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📝</span> Repaso
+                    </button>
+                    <button onclick="prepQuiz('extra', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📚</span> Práctica
+                    </button>
+                    <button onclick="prepQuiz('evaluacion_final', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📊</span> Evaluación
+                    </button>
+                    <button onclick="showSection('pdf', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📋</span> Pizarra
+                    </button>
+                    <button onclick="showSection('video', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>🎥</span> Video
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <main id="app" class="max-w-5xl mx-auto p-6">
+    </main>
+    <script>
+        const DRIVE_PDF_URL = "https://drive.google.com/file/d/1P2UdmEnrHj0BolJHB_nPsdmwJnz9GzmA/view?usp=sharing";
+        const DRIVE_VIDEO_URL = "https://drive.google.com/file/d/14tG1Xvu_0zsBH9XaWtNtccIitFG5l2qc/view?usp=sharing";
+
+
+        // PRINCIPAL (Deber + Repaso) 30/10 preguntas
+
+        const quizData = [
+            { question: 'Indique la alternativa que completa correctamente el grafico. <br> <img src="https://i.ibb.co/whYz8jpz/Captura-de-pantalla-2026-08-05-115022.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La matriz está forma por triángulos donde las puntas se pintan consecutivamente, además de tener un triangulo incrustado que también la parte pintada gira. <br> <img src="https://i.ibb.co/s92bTQv5/Captura-de-pantalla-2026-09-18-092108.png" alt="Descripción de la imagen" width="420" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Indique la alternativa que completa correctamente el grafico. <br> <img src="https://i.ibb.co/MDytBCRN/Captura-de-pantalla-2026-08-05-115418.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La parte pintada de negro en forma de triangulo cambia de posición en sentido anti-horario, además de la línea pintada gira en sentido horario. <br> <img src="https://i.ibb.co/F4Btn8MF/Captura-de-pantalla-2026-09-18-092902.png" alt="Descripción de la imagen" width="420" height="230">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/PZWTtx3G/Captura-de-pantalla-2026-08-05-115528.png" alt="Descripción de la imagen" width="350" height="300">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La matriz cambia de figura en la secuencia de triangulo, circulo y rombo; por lo que en el eslabón final ya existe un circulo, rombo, faltando un triangulo. Además dentro de las figuras existen líneas verticales, horizontales y juntas. <br> <img src="https://i.ibb.co/B5bP4xS0/Captura-de-pantalla-2026-09-18-093846.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/jvvjW4qy/Captura-de-pantalla-2026-08-05-115926.png" alt="Descripción de la imagen" width="350" height="300">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'Las figuras geométricas presentadas en la matriz, giran en sentido anti-horario. <br> <img src="https://i.ibb.co/8LNHMf4m/Captura-de-pantalla-2026-09-18-094201.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/xqsCL3KF/Captura-de-pantalla-2026-08-05-120220.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'El dado sigue una secuencia donde deja una cara como eje de rotación, en el primer conjunto el eje de rotación es la cara con el número 3, en la siguiente conserva la cara superior con el 4 y finalmente se tiene el eje con la cara lateral izquierda con el 4. <br> <img src="https://i.ibb.co/Pzs0W0dt/Captura-de-pantalla-2026-09-18-094503.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/HL2gJZVP/Captura-de-pantalla-2026-08-05-120427.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'Las figuras geométricas internas cambian teniendo una secuencia de tres figuras, circulo, cuadrado y triangulo, además en el último eslabón se observa que las figuras que encierran a la pintada deben ser las mimas. <br> <img src="https://i.ibb.co/fzDKfch2/Captura-de-pantalla-2026-09-18-094647.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/tp88pKmx/Captura-de-pantalla-2026-08-05-120724.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La matriz muestra la secuencia de unión, es decir, el primer cubo se fusiona con el segundo para formar el tercer, por lo que las líneas forman cuadrículas. <br> <img src="https://i.ibb.co/k2fv644c/Captura-de-pantalla-2026-09-18-095033.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/1J9szn7t/Captura-de-pantalla-2026-08-05-120850.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'Las figuras pintadas dentro del cuadrado giran de la siguiente manera, el cuadrado pintado en sentido horario y el triangulo en sentido horario dos posiciones. <br> <img src="https://i.ibb.co/ds18WsQD/Captura-de-pantalla-2026-09-18-095208.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/35dHxng6/Captura-de-pantalla-2026-08-05-134554.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'A', explanation: 'La matriz muestra la secuencia de unión, es decir, el primer elemento se fusiona con el segundo para formar el tercer. <br> <img src="https://i.ibb.co/yFqK3HBJ/Captura-de-pantalla-2026-09-18-095540.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/gL7NSMwH/Captura-de-pantalla-2026-08-05-134805.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La matriz indica que existen dos figuras exactamente iguales, pero girada anti-horariamente en cada columna. <br> <img src="https://i.ibb.co/dsrHMwtH/Captura-de-pantalla-2026-09-18-095740.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/jvPZQfwG/Captura-de-pantalla-2026-08-05-135026.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'A', explanation: 'La matriz muestra que al tener un elemento con dos figuras, a su derecha se encuentra la figura interna del mismo. <br> <img src="https://i.ibb.co/JwCXyKkn/Captura-de-pantalla-2026-09-18-100107.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/fV0ZkSQP/Captura-de-pantalla-2026-08-05-135435.png" alt="Descripción de la imagen" width="350" height="380">', options: ['E', 'F', 'G', 'H'], answer: 'F', explanation: 'La matriz indica que existen una disminución de elementos, en la primera figura se quitan las líneas de la segunda. <br> <img src="https://i.ibb.co/v695xLT4/Captura-de-pantalla-2026-09-18-100229.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/cVKg6K1/Captura-de-pantalla-2026-08-05-135623.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'A', explanation: 'La matriz muestra que existen dos figuras exactamente iguales en cada columna, y la figura que se repite son las dos primeras filas. <br> <img src="https://i.ibb.co/0yc78LZ0/Captura-de-pantalla-2026-09-18-100456.png" alt="Descripción de la imagen" width="440" height="220">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/zVhRzZ1N/Captura-de-pantalla-2026-08-05-135735.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'La matriz indica que la figura de la primera fila se superpone en la segunda fila y en la tercera fila se muestra lo que queda dentro de estas figuras. <br> <img src="https://i.ibb.co/MDq5X29h/Captura-de-pantalla-2026-09-18-100630.png" alt="Descripción de la imagen" width="380" height="380">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/sY0Z7PB/Captura-de-pantalla-2026-08-05-140009.png" alt="Descripción de la imagen" width="350" height="380">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La matriz indica que la figura de la primera fila se superpone en la segunda fila y en la tercera fila se muestra las líneas sobrantes. <br> <img src="https://i.ibb.co/2YsQ6mjx/Captura-de-pantalla-2026-09-18-101021.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/b5tVHxgy/Captura-de-pantalla-2026-08-05-140300.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'Las figuras giran en cada fila, además de aumentar un elemento. <br> <img src="https://i.ibb.co/5hLkkpVr/Captura-de-pantalla-2026-09-18-101514.png" alt="Descripción de la imagen" width="450" height="250">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/27gCqMqb/Captura-de-pantalla-2026-08-05-140443.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La matriz indica que las figuras se alternan con líneas verticales, horizontales y son líneas. <br> <img src="https://i.ibb.co/RTct0fVq/Captura-de-pantalla-2026-09-18-102056.png" alt="Descripción de la imagen" width="450" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/kVBgm4Q1/Captura-de-pantalla-2026-08-05-140559.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'A', explanation: 'En cada fila se aumenta un elemento extra. <br> <img src="https://i.ibb.co/gFW6b3LV/Captura-de-pantalla-2026-09-18-102505.png" alt="Descripción de la imagen" width="450" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/60npnxLQ/Captura-de-pantalla-2026-08-05-140839.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La matriz se muestra que las líneas se mueven consecutivamente, pero alternando las líneas. <br> <img src="https://i.ibb.co/xSJBzb4F/Captura-de-pantalla-2026-09-18-102624.png" alt="Descripción de la imagen" width="450" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/TqBQXDbD/Captura-de-pantalla-2026-08-05-141041.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'Dentro de cada elemento las líneas se superponen y las líneas que se sobre monte otra línea se elimina. <br> <img src="https://i.ibb.co/1p95C4f/Captura-de-pantalla-2026-09-18-102739.png" alt="Descripción de la imagen" width="450" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/G4yYymkD/Captura-de-pantalla-2026-08-05-141227.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'A', explanation: 'De derecha a izquierda se incrementan las líneas. <br> <img src="https://i.ibb.co/PZWj5brr/Captura-de-pantalla-2026-09-18-102924.png" alt="Descripción de la imagen" width="450" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/pjf549Nq/Captura-de-pantalla-2026-08-05-141356.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'La matriz muestra existen dos partes, en la última columna se observa que el elemento 1 cambia su posición. <br> <img src="https://i.ibb.co/mVMLbs97/Captura-de-pantalla-2026-09-18-103108.png" alt="Descripción de la imagen" width="450" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/CsBSD2RG/Captura-de-pantalla-2026-08-05-141744.png" alt="Descripción de la imagen" width="350" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La matriz muestra que si superponemos las figuras la tercera fila muestra solo las líneas que se sobreponen. <br> <img src="https://i.ibb.co/ds7FvGmg/Captura-de-pantalla-2026-09-18-103354.png" alt="Descripción de la imagen" width="450" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/wN4vJkKv/Captura-de-pantalla-2026-08-05-141859.png" alt="Descripción de la imagen" width="380" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'D', explanation: 'Si superponemos la fila uno y dos en la fila tres nos muestra las líneas que no coinciden. <br> <img src="https://i.ibb.co/bRg4K8FK/Captura-de-pantalla-2026-09-18-103615.png" alt="Descripción de la imagen" width="500" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/j949rGk9/Captura-de-pantalla-2026-08-05-142051.png" alt="Descripción de la imagen" width="380" height="400">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'La matriz indica que la figura tiene un aumento de líneas y consecutivamente estas líneas se transforman en círculos. <br> <img src="https://i.ibb.co/N6kJ511w/Captura-de-pantalla-2026-09-18-104919.png" alt="Descripción de la imagen" width="450" height="240">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/twMRgbnn/Captura-de-pantalla-2026-08-05-142207.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'El hexágono queda en todos los momentos en la misma posición; igual que el triangulo pero este gira 180°. <br> <img src="https://i.ibb.co/HS1bLWF/Captura-de-pantalla-2026-09-18-104745.png" alt="Descripción de la imagen" width="400" height="340">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/rRWSCLPy/Captura-de-pantalla-2026-08-05-142426.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La matriz indica que de columna en columna gira para formar un área mas amplia de parte pintada, y en cada fila se repite la figura. <br> <img src="https://i.ibb.co/PG9hSy36/Captura-de-pantalla-2026-09-18-105301.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/bjTrZrt5/Captura-de-pantalla-2026-08-05-142533.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'Las figuras se superponen y forman la tercera. <br> <img src="https://i.ibb.co/QF3fPQ3p/Captura-de-pantalla-2026-09-18-105704.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/HTjzRDbk/Captura-de-pantalla-2026-08-05-142652.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La matriz indica que la figura se mueve primero una posición y luego dos posiciones, y en las filas debemos tener líneas inclinadas, horizontales y verticales. <br> <img src="https://i.ibb.co/Ng2vbSZj/Captura-de-pantalla-2026-09-18-105847.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/60fdsSTV/Captura-de-pantalla-2026-08-05-142857.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'Si fusionamos la fila 1 y 3 completamos todas las partes pintadas. <br> <img src="https://i.ibb.co/KxkbB9Kc/Captura-de-pantalla-2026-09-18-110012.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+        ];
+
+
+        // Practica 20 preguntas
+
+        const quizDataExtra = [
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/Fbr7kkPs/Captura-de-pantalla-2026-08-05-143202.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La matriz indica que la figura de la primera fila se superpone en la segunda fila y en la tercera fila se muestra las líneas sobrantes. <br> <img src="https://i.ibb.co/67dznqRY/Captura-de-pantalla-2026-09-18-110505.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/TMktPBtC/Captura-de-pantalla-2026-08-05-143308.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La matriz indica que la figura de la primera fila se superpone en la segunda fila y en la tercera fila se muestra las líneas sobrantes. <br> <img src="https://i.ibb.co/VYrS11WB/Captura-de-pantalla-2026-09-18-111458.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/qLLyzcjc/Captura-de-pantalla-2026-08-05-143424.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La matriz indica que la figura de la primera fila se superpone en la segunda fila y en la tercera fila se muestra el resultado. <br> <img src="https://i.ibb.co/qMVHdzHz/Captura-de-pantalla-2026-09-18-113547.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/zVKqct17/Captura-de-pantalla-2026-08-05-144152.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'E', explanation: 'La matriz indica que la figura de la tercera fila se superpone en la segunda fila y en la primera fila se muestra las líneas que no se repiten. <br> <img src="https://i.ibb.co/XZ7Rd85r/Captura-de-pantalla-2026-09-18-113740.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/nqfMB3HS/Captura-de-pantalla-2026-08-05-144329.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La matriz indica que la figura de la primera fila se superpone en la segunda fila y en la tercera fila se muestra las líneas sobrantes. <br> <img src="https://i.ibb.co/67mGz8gy/Captura-de-pantalla-2026-09-18-114533.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/Ngd0nzVs/Captura-de-pantalla-2026-08-05-144448.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'Se realiza una superposición entre la fila uno y dos. <br> <img src="https://i.ibb.co/5gyHywrB/Captura-de-pantalla-2026-09-18-114716.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/G68KKhJ/Captura-de-pantalla-2026-08-05-145846.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'E', explanation: 'La matriz indica que la figura de la primera fila se superpone en la segunda fila y en la tercera fila se muestra las líneas sobrantes. <br> <img src="https://i.ibb.co/WvZb6P1y/Captura-de-pantalla-2026-09-18-115057.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/zWvwzyfq/Captura-de-pantalla-2026-08-05-150010.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'E', explanation: 'Los recuadros de la fila dos son las letras que aparecen en la fila tres. <br> <img src="https://i.ibb.co/Q7v6cH5Y/Captura-de-pantalla-2026-09-18-115255.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/Fk6KHbZy/Captura-de-pantalla-2026-08-05-150231.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La matriz indica que las figuras de la fila uno y tres son las mismas. <br> <img src="https://i.ibb.co/3mWTGXVc/Captura-de-pantalla-2026-09-18-115601.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/sv9DBR2d/Captura-de-pantalla-2026-08-05-150401.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'El rectángulo se mueve a la derecha, izquierda y el centro, además de tener una secuencia de figuras, circulo blanco, circulo negro y estrella. <br> <img src="https://i.ibb.co/LXDJkGNW/Captura-de-pantalla-2026-09-19-091312.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/3mQSzRp8/Captura-de-pantalla-2026-08-05-150709.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La matriz la siguiente secuencia en la primera columna existen dos figuras con elementos afuera y uno dentro, en la siguiente columna dos figuras tienen elemento dentro y una afuera, por lo que en la tercera columna debe existir nuevamente dos figuras con elementos afuera. <br> <img src="https://i.ibb.co/hxHkt4tx/Captura-de-pantalla-2026-09-19-091511.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/nNrcWMwv/Captura-de-pantalla-2026-08-05-150817.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La matriz presenta que en cada columna existen las siguientes figuras: Triangulo blanco, triangulo rectángulo y triangulo pintado. Y a medida que se salta un eslabón se corre una figura. <br> <img src="https://i.ibb.co/r2c7RDFC/Captura-de-pantalla-2026-09-19-091725.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/SDD9sRdR/Captura-de-pantalla-2026-08-05-150928.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'La matriz indica que de columna en columna la línea cambia de posición hacia abajo. <br> <img src="https://i.ibb.co/zWY95vNb/Captura-de-pantalla-2026-09-19-091918.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/p6bWkD7X/Captura-de-pantalla-2026-08-05-151043.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'Las figuras se superponen para formar la figura de la tercera fila. <br> <img src="https://i.ibb.co/tp5W7fNd/Captura-de-pantalla-2026-09-19-092113.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/S7Hv1j3d/Captura-de-pantalla-2026-08-05-151248.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'Las figuras se superponen para formar la figura de la tercera fila. <br> <img src="https://i.ibb.co/6c0MwYtb/Captura-de-pantalla-2026-09-19-092307.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/yng33F5r/Captura-de-pantalla-2026-08-05-151428.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'Se hace una superposición y las líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/Kz6sD6vH/Captura-de-pantalla-2026-09-19-092430.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/HDbXNmZ2/Captura-de-pantalla-2026-08-05-151932.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'La matriz indica que la figura de la primera fila se superpone en la segunda fila y en la tercera fila se muestra las líneas sobrantes. <br> <img src="https://i.ibb.co/4nHJvpn3/Captura-de-pantalla-2026-09-19-092611.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/zW9pt4hG/Captura-de-pantalla-2026-08-05-152102.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'E', explanation: 'Las figuras tienen una sucesión con un triangulo cuadrado rectángulo y un hexágono. <br> <img src="https://i.ibb.co/rfytdhQb/Captura-de-pantalla-2026-09-19-092746.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/ZptRzqnL/Captura-de-pantalla-2026-08-05-152332.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'La matriz indica que la después de la figura sola aparece una nueva pintada. <br> <img src="https://i.ibb.co/k6vn8MBY/Captura-de-pantalla-2026-09-19-092942.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+            { question: '¿Cuál de las alternativas remplaza el signo de interrogación? <br> <img src="https://i.ibb.co/B2PkRhWR/Captura-de-pantalla-2026-08-05-152445.png" alt="Descripción de la imagen" width="380" height="300">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'La secuencia en la matriz es que la figua con un punto se desplaza en sentido anti-horario y la figura pintada se desplaza dos posiciones, una posición, etc. <br> <img src="https://i.ibb.co/8LDX8mmK/Captura-de-pantalla-2026-09-19-093222.png" alt="Descripción de la imagen" width="400" height="300">', multi: 'OFF', maxSelect: 1 },
+        ];
+
+        // EVALUACIÓN (16 preguntas)
+
+        const quizDataEvaluacion = [
+            { question: 'Identifique la figura que falta en la siguiente matriz. <br> <img src="https://i.ibb.co/B2RRX0CL/Captura-de-pantalla-2026-09-19-094903.png" alt="Descripción de la imagen" width="400" height="350">', options: ['1', '2', '3', '4', '5', '6', '7', '8'], answer: '3', explanation: 'Existe una coincidencia de figuras, existe “un rombo, estrella y circulo” en la siguiente fila está la “estrella, circulo y rombo” finalmente en la tercera fila tenemos “un circulo, rombo debemos buscar una estrella”. Además también cambia su exterior, teniendo líneas, cuadrado y cuatro puntos negros, en la fila dos  tenemos puntos negros, líneas y cuadrado y finalmente en la ultima fila cuadrado, puntos negros, necesitamos líneas. <br> <img src="https://i.ibb.co/5h62JFBt/Captura-de-pantalla-2026-09-19-095103.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Identifique la figura que resulta de un giro de la principal. <br> <img src="https://i.ibb.co/5gMfxNWq/Captura-de-pantalla-2026-09-19-095252.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D'], answer: 'C', explanation: 'La secuencia se ce al restar los puntos internos menos los puntos externos quedando: <br> Fila 1: 3(puntos internos)-2(puntos externos)=1(resultado) <br> Fila 2: 3-1=2 <br> Fila 3: 2-2=0 <br> En este caso la respuesta es la opción C. <br> <img src="https://i.ibb.co/sdG35w3v/Captura-de-pantalla-2026-09-19-095456.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/C3KwNncW/Captura-de-pantalla-2026-09-19-095709.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D'], answer: 'B', explanation: 'Para resolver esta matriz gráfica, analizamos el patrón de las figuras fila por fila dividiendo cada elemento en dos partes: <br> Parte inferior (Sombra/Color): <br> Fila 1: Gris, Negro, Negro <br> Fila 2: Gris, Negro, Gris <br> Fila 3: Negro, Negro, Gris (La figura faltante debe ser gris). <br> 2. Parte superior (Forma/Símbolo):Cada fila contiene una combinación de dos figuras iguales y una diferente: <br> Fila 1: Dos cruces y un cuadrado. <br> Fila 2: Dos círculos y un cuadrado. <br> Fila 3: Ya contamos con una cruz y un cuadrado, por lo que la figura faltante debe repetir el cuadrado para cumplir con la regla del par. <br> La figura requerida debe tener la parte inferior gris y la parte superior con un cuadrado. Por lo tanto, la respuesta correcta es la Opción B. <br> <img src="https://i.ibb.co/FS356Mg/Captura-de-pantalla-2026-09-19-095837.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/Cp0WDXY4/Captura-de-pantalla-2026-09-19-100425.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/JWDSHvFQ/Captura-de-pantalla-2026-09-19-101333.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/R46vjkd2/Captura-de-pantalla-2026-09-19-101803.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/B25B5vyG/Captura-de-pantalla-2026-09-19-101935.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/MkyM4kS4/Captura-de-pantalla-2026-09-19-102437.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/1fQptvjj/Captura-de-pantalla-2026-09-19-102606.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/Tq2MWKqL/Captura-de-pantalla-2026-09-19-102850.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/qMyYzvKS/Captura-de-pantalla-2026-09-19-103010.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/zVxt4CDz/Captura-de-pantalla-2026-09-19-103616.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen. <br> <img src="https://i.ibb.co/xtvVJkPv/Captura-de-pantalla-2026-09-19-104649.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/Qj8WxfpW/Captura-de-pantalla-2026-09-19-111739.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen. <br> <img src="https://i.ibb.co/yFg1qhJj/Captura-de-pantalla-2026-09-19-111956.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/zTbr9Q30/Captura-de-pantalla-2026-09-19-112827.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'A', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/0j17Wjjs/Captura-de-pantalla-2026-09-19-113116.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/kghd5nFH/Captura-de-pantalla-2026-09-19-113448.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/YTy4fCWX/Captura-de-pantalla-2026-09-19-113559.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/mVmdyp7r/Captura-de-pantalla-2026-09-19-114003.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen. <br> <img src="https://i.ibb.co/3mWCrtWj/Captura-de-pantalla-2026-09-19-114159.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/Nd2vT08f/Captura-de-pantalla-2026-09-19-114309.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'B', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/tM1PY0m8/Captura-de-pantalla-2026-09-19-114529.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/Ps9cRq6P/Captura-de-pantalla-2026-09-19-114646.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'E', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/Xfrt9yyx/Captura-de-pantalla-2026-09-19-114755.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/GQq1n0Kb/Captura-de-pantalla-2026-09-19-114844.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'D', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/tw7GDFkJ/Captura-de-pantalla-2026-09-19-115100.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+            { question: 'Reemplaza el signo de interrogación. <br> <img src="https://i.ibb.co/zTspsM9c/Captura-de-pantalla-2026-09-19-115447.png" alt="Descripción de la imagen" width="400" height="350">', options: ['A', 'B', 'C', 'D', 'E'], answer: 'C', explanation: 'El primer elemento se suma con el segundo elemento es decir se unen y la líneas que se repiten se eliminan. <br> <img src="https://i.ibb.co/yB7sVB6C/Captura-de-pantalla-2026-09-19-115604.png" alt="Descripción de la imagen" width="400" height="350">', multi: 'OFF', maxSelect: 1 },
+        ];
+
+        let state = {
+            currentMode: 'deber',
+            view: 'quiz_home',
+            studentName: '',
+            studentEmail: '',
+            activeQuestions: [],
+            currentQuestion: 0,
+            score: 0,
+            selectedAnswer: null,
+            isAnswerCorrect: null,
+            emailStatus: null,
+            emailAnalysis: null,
+            emailAnalysisMsg: ''
+        };
+
+        const disposableDomains = [
+            'tempmail.com','temp-mail.org','guerrillamail.com','10minutemail.com','mailinator.com',
+            'yopmail.com','throwawaymail.com','fakeinbox.com','trashmail.com','getnada.com',
+            'maildrop.cc','dispostable.com','sharklasers.com','guerrillamailblock.com'
+        ];
+        const trustedProviders = [
+            'gmail.com','googlemail.com','hotmail.com','hotmail.es','hotmail.co.uk','outlook.com',
+            'outlook.es','live.com','msn.com','yahoo.com','yahoo.es','icloud.com','me.com',
+            'protonmail.com','proton.me','aol.com','zoho.com','gmx.com','mail.com'
+        ];
+
+        function isValidEmailFormat(email) {
+            const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+            return re.test(email) && email.length <= 254 && !email.includes('..') && !email.startsWith('.') && !email.endsWith('.');
+        }
+
+        function analyzeEmail(email) {
+            const lower = email.toLowerCase().trim();
+            if (!lower) {
+                return { valid: false, msg: 'Escribe un correo electrónico.' };
+            }
+            if (!isValidEmailFormat(lower)) {
+                return { valid: false, msg: 'Formato inválido. Revisa que tenga @ y un dominio correcto.' };
+            }
+            const domain = lower.split('@')[1];
+            if (!domain || domain.length < 3) {
+                return { valid: false, msg: 'Dominio incompleto o inválido.' };
+            }
+            if (disposableDomains.some(d => domain === d || domain.endsWith('.' + d))) {
+                return { valid: false, msg: 'Correo temporal / desechable detectado. Usa un correo real.' };
+            }
+            const isTrusted = trustedProviders.some(p => domain === p);
+            const hasGoodTld = /\.(com|es|net|org|edu|gov|mx|ar|co|uk|de|fr|it|pt|br|cl)$/i.test(domain);
+            if (!hasGoodTld && !isTrusted) {
+                return { valid: false, msg: 'Dominio poco común o sospechoso. Usa Gmail, Hotmail/Outlook, Yahoo, etc.' };
+            }
+            let analysisText = '';
+            if (domain.includes('hotmail') || domain.includes('outlook') || domain.includes('live.com') || domain.includes('msn.com')) {
+                analysisText = 'Análisis: proveedor Microsoft (Hotmail/Outlook) detectado · formato correcto · dominio legítimo';
+            } else if (domain.includes('gmail') || domain.includes('googlemail')) {
+                analysisText = 'Análisis: proveedor Google (Gmail) detectado · formato correcto · dominio legítimo';
+            } else if (isTrusted) {
+                analysisText = 'Análisis: proveedor conocido · formato correcto · dominio legítimo';
+            } else {
+                analysisText = 'Análisis: formato válido · dominio con TLD estándar · no se detectaron patrones de correo temporal';
+            }
+            return { valid: true, msg: analysisText };
+        }
+
+        function showSection(section, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const app = document.getElementById('app');
+            if (section === 'pdf') {
+                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">📄 Pizarra Virtual</h2><div class="iframe-container"><iframe src="${DRIVE_PDF_URL}" width="100%" height="100%"></iframe></div></div>`;
+            } else if (section === 'video') {
+                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">🎥 Video Clase</h2><div class="iframe-container"><iframe src="${DRIVE_VIDEO_URL}" width="100%" height="100%"></iframe></div></div>`;
+            }
+        }
+
+        function prepQuiz(mode, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+           
+            state = {
+                currentMode: mode,
+                view: 'quiz_home',
+                studentName: '',
+                studentEmail: '',
+                activeQuestions: [],
+                currentQuestion: 0,
+                score: 0,
+                selectedAnswer: null,
+                isAnswerCorrect: null,
+                emailStatus: null,
+                emailAnalysis: null,
+                emailAnalysisMsg: ''
+            };
+            render();
+        }
+
+        function startQuiz() {
+            if (state.currentMode === 'deber') {
+                // Práctica: 30 preguntas en orden
+                state.activeQuestions = [...quizData].slice(0, 30);
+            } else if (state.currentMode === 'evaluacion') {
+                // Repaso: 10 preguntas aleatorias
+                state.activeQuestions = [...quizData]
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 10);
+            } else if (state.currentMode === 'extra') {
+                // Deber: 20 preguntas en orden
+                state.activeQuestions = [...quizDataExtra].slice(0, 20);
+            } else if (state.currentMode === 'evaluacion_final') {
+                // Evaluación: 16 preguntas en orden
+                state.activeQuestions = [...quizDataEvaluacion];
+            }
+            state.view = 'name_input';
+            state.emailAnalysis = null;
+            state.emailAnalysisMsg = '';
+            render();
+        }
+
+        function onEmailInput() {
+            const e = document.getElementById('email-in');
+            if (!e) return;
+            const val = e.value.trim();
+            if (val.length < 5) {
+                state.emailAnalysis = null;
+                state.emailAnalysisMsg = '';
+                updateEmailUI();
+                return;
+            }
+            state.emailAnalysis = 'checking';
+            state.emailAnalysisMsg = 'Analizando correo…';
+            updateEmailUI();
+            clearTimeout(window._emailCheckTimer);
+            window._emailCheckTimer = setTimeout(() => {
+                const result = analyzeEmail(val);
+                state.emailAnalysis = result.valid ? 'valid' : 'invalid';
+                state.emailAnalysisMsg = result.msg;
+                updateEmailUI();
+            }, 600);
+        }
+
+        function updateEmailUI() {
+            const feedback = document.getElementById('email-feedback');
+            const analysis = document.getElementById('email-analysis');
+            const input = document.getElementById('email-in');
+            if (!feedback || !analysis || !input) return;
+            if (state.emailAnalysis === 'checking') {
+                feedback.innerHTML = `<span class="text-slate-500 text-sm flex items-center gap-2"><span class="dot-pulse">●</span> Verificando…</span>`;
+                analysis.innerHTML = `<p class="text-xs text-slate-400 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-red-400', 'border-emerald-400');
+                input.classList.add('border-slate-300');
+            } else if (state.emailAnalysis === 'invalid') {
+                feedback.innerHTML = `<span class="text-red-600 text-sm font-semibold">✗ Correo no válido o inexistente</span>`;
+                analysis.innerHTML = `<p class="text-xs text-red-500/80 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-emerald-400', 'border-slate-300');
+                input.classList.add('border-red-400');
+            } else if (state.emailAnalysis === 'valid') {
+                feedback.innerHTML = `<span class="text-emerald-600 text-sm font-semibold">✓ Correo aceptado</span>`;
+                analysis.innerHTML = `<p class="text-xs text-emerald-600/80 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-red-400', 'border-slate-300');
+                input.classList.add('border-emerald-400');
+            } else {
+                feedback.innerHTML = '';
+                analysis.innerHTML = '';
+                input.classList.remove('border-red-400', 'border-emerald-400');
+                input.classList.add('border-slate-300');
+            }
+        }
+
+        function validaDatos() {
+            const n = document.getElementById('name-in').value.trim();
+            const e = document.getElementById('email-in').value.trim();
+            if (n.length <= 2) {
+                alert("Ingresa nombre completo (mínimo 3 caracteres).");
+                return;
+            }
+            const result = analyzeEmail(e);
+            state.emailAnalysis = result.valid ? 'valid' : 'invalid';
+            state.emailAnalysisMsg = result.msg;
+            updateEmailUI();
+            if (!result.valid) return;
+            state.studentName = n;
+            state.studentEmail = e;
+            state.view = 'playing';
+            render();
+        }
+
+        // ---------- LÓGICA SINGLE + MULTI ----------
+        function isMultiQuestion(q) {
+            return q.multi === 'ON';
+        }
+
+        function arraysEqual(a, b) {
+            if (!Array.isArray(a) || !Array.isArray(b)) return false;
+            if (a.length !== b.length) return false;
+            const sa = [...a].sort();
+            const sb = [...b].sort();
+            return sa.every((v, i) => v === sb[i]);
+        }
+
+        function handleAnswer(option) {
+            if (state.isAnswerCorrect !== null) return;
+
+            const currentQ = state.activeQuestions[state.currentQuestion];
+
+            if (isMultiQuestion(currentQ)) {
+                let selected = Array.isArray(state.selectedAnswer) ? [...state.selectedAnswer] : [];
+                const idx = selected.indexOf(option);
+
+                if (idx > -1) {
+                    selected.splice(idx, 1);
+                } else {
+                    if (selected.length >= currentQ.maxSelect) return;
+                    selected.push(option);
+                }
+                state.selectedAnswer = selected;
+                render();
+            } else {
+                if (state.selectedAnswer !== null) return;
+                state.selectedAnswer = option;
+                state.isAnswerCorrect = (option === currentQ.answer);
+                if (state.isAnswerCorrect) state.score++;
+                render();
+                if (state.isAnswerCorrect) {
+                    setTimeout(() => nextQuestion(), 1000);
+                }
+            }
+        }
+
+        function checkMultiAnswer() {
+            if (state.isAnswerCorrect !== null) return;
+
+            const currentQ = state.activeQuestions[state.currentQuestion];
+            if (!isMultiQuestion(currentQ)) return;
+
+            const selected = Array.isArray(state.selectedAnswer) ? state.selectedAnswer : [];
+            if (selected.length === 0) return;
+
+            const correctAnswers = Array.isArray(currentQ.answer) ? currentQ.answer : [currentQ.answer];
+            state.isAnswerCorrect = arraysEqual(selected, correctAnswers);
+
+            if (state.isAnswerCorrect) state.score++;
+            render();
+
+            if (state.isAnswerCorrect) {
+                setTimeout(() => nextQuestion(), 1000);
+            }
+        }
+
+        function nextQuestion() {
+            if (state.currentQuestion + 1 < state.activeQuestions.length) {
+                state.currentQuestion++;
+                state.selectedAnswer = null;
+                state.isAnswerCorrect = null;
+                render();
+            } else {
+                state.view = 'results';
+                render();
+                enviarCorreo();
+            }
+        }
+
+        function enviarCorreo() {
+            if (!state.studentEmail) return;
+            state.emailStatus = 'sending';
+            render();
+            const scorePerc = Math.round((state.score / state.activeQuestions.length) * 100);
+            const totalQ = state.activeQuestions.length;
+            let imageUrl = '';
+            let mensaje = '';
+            if (scorePerc >= 90) {
+                imageUrl = 'https://img.icons8.com/color/128/medal2.png';
+                mensaje = `¡Excelente trabajo, ${state.studentName}! Obtuviste un resultado sobresaliente.`;
+            } else if (scorePerc >= 70) {
+                imageUrl = 'https://img.icons8.com/color/128/diploma.png';
+                mensaje = `¡Muy bien, ${state.studentName}! Has aprobado con un buen resultado.`;
+            } else if (scorePerc >= 50) {
+                imageUrl = 'https://img.icons8.com/color/128/ok.png';
+                mensaje = `Buen esfuerzo, ${state.studentName}. Sigue practicando para mejorar.`;
+            } else {
+                imageUrl = 'https://img.icons8.com/color/128/error.png';
+                mensaje = `Ánimo, ${state.studentName}. Revisa el material y vuelve a intentarlo.`;
+            }
+            const params = {
+                to_name: state.studentName,
+                to_email: state.studentEmail,
+                score: scorePerc,
+                correct_answers: state.score,
+                total_questions: totalQ,
+                mode_name: state.currentMode.toUpperCase(),
+                image_url: imageUrl,
+                mensaje: mensaje,
+                fecha: new Date().toLocaleDateString('es-ES', {
+                    year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                })
+            };
+            emailjs.send("service_dhvsi72", "template_cy74x9h", params)
+                .then(() => {
+                    state.emailStatus = 'success';
+                    render();
+                })
+                .catch((err) => {
+                    console.error('Error EmailJS:', err);
+                    state.emailStatus = 'error';
+                    render();
+                });
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+           
+            let modeTitle = '';
+            let modeDesc = '';
+            if (state.currentMode === 'deber') {
+                modeTitle = '🧪 Deber';
+                modeDesc = 'Resuelve las 30 preguntas del banco en orden.';
+            } else if (state.currentMode === 'evaluacion') {
+                modeTitle = '📝 Repaso';
+                modeDesc = 'Prueba de 10 preguntas seleccionadas al azar.';
+            } else if (state.currentMode === 'extra') {
+                modeTitle = '📚 Práctica';
+                modeDesc = 'Resuelve las 20 preguntas de la Práctica.';
+            } else if (state.currentMode === 'evaluacion_final') {
+                modeTitle = '📊 Evaluación';
+                modeDesc = 'Resuelve las 16 preguntas de la Evaluación.';
+            }
+           
+            if (state.view === 'quiz_home') {
+                app.innerHTML = `
+                <div class="text-center py-16 animate-fade-in bg-white rounded-[3rem] shadow-xl border">
+                    <h2 class="text-4xl font-black text-slate-800 mb-2">${modeTitle}</h2>
+                    <p class="text-slate-500 mb-8 text-lg">${modeDesc}</p>
+                    <button onclick="startQuiz()" class="bg-emerald-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-emerald-700 transition-all">
+                        INICIAR
+                    </button>
+                </div>`;
+            }
+
+            if (state.view === 'name_input') {
+                app.innerHTML = `
+                <div class="max-w-md mx-auto bg-white p-10 rounded-[2.5rem] shadow-2xl animate-fade-in">
+                    <h2 class="text-2xl font-black mb-6 text-center">Registro de Estudiante</h2>
+                    <input id="name-in" type="text" placeholder="Nombre y Apellido completo" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl mb-4 focus:border-emerald-500 outline-none">
+                   
+                    <div class="relative mb-1">
+                        <input id="email-in" type="email" placeholder="Correo para recibir nota (Gmail, Hotmail…)"
+                               class="w-full p-4 bg-slate-50 border border-slate-300 rounded-xl focus:border-emerald-500 outline-none transition-colors"
+                               oninput="onEmailInput()" onblur="onEmailInput()">
+                    </div>
+                   
+                    <div id="email-feedback" class="min-h-[22px] mb-1"></div>
+                    <div id="email-analysis" class="mb-5"></div>
+                   
+                    <button onclick="validaDatos()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all">
+                        ENTRAR AL TEST
+                    </button>
+                    <p class="text-center text-[11px] text-slate-400 mt-4">Se verifica formato y se descartan correos temporales. No se envía nada hasta terminar el test.</p>
+                </div>`;
+                setTimeout(updateEmailUI, 50);
+            }
+
+            if (state.view === 'playing') {
+                const q = state.activeQuestions[state.currentQuestion];
+                const progress = ((state.currentQuestion + 1) / state.activeQuestions.length) * 100;
+                const multi = isMultiQuestion(q);
+                const selected = multi
+                    ? (Array.isArray(state.selectedAnswer) ? state.selectedAnswer : [])
+                    : (state.selectedAnswer ? [state.selectedAnswer] : []);
+
+                const multiHint = multi
+                    ? `<p class="text-sm text-sky-600 font-semibold mb-4">
+                         Selección múltiple · elige ${q.maxSelect} respuesta${q.maxSelect > 1 ? 's' : ''}
+                         ${selected.length > 0 ? `(${selected.length}/${q.maxSelect})` : ''}
+                       </p>`
+                    : '';
+
+                app.innerHTML = `
+                <div class="animate-fade-in">
+                    <div class="flex justify-between items-center mb-6 px-4">
+                        <span class="font-black text-emerald-600">${state.currentQuestion + 1} / ${state.activeQuestions.length}</span>
+                        <div class="w-48 bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full transition-all" style="width:${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl border">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2 leading-tight">${q.question}</h2>
+                        ${multiHint}
+                        <div class="grid gap-3">
+                            ${q.options.map(opt => {
+                                let style = "border-slate-100 bg-slate-50 hover:border-emerald-200";
+                                const isSelected = selected.includes(opt);
+
+                                if (state.isAnswerCorrect !== null) {
+                                    if (multi) {
+                                        const correctSet = Array.isArray(q.answer) ? q.answer : [q.answer];
+                                        if (correctSet.includes(opt) && isSelected) {
+                                            style = "border-emerald-500 bg-emerald-100 text-emerald-800";
+                                        } else if (isSelected && !correctSet.includes(opt)) {
+                                            style = "border-red-500 bg-red-100 text-red-800";
+                                        } else if (correctSet.includes(opt) && !isSelected) {
+                                            style = "border-emerald-300 bg-emerald-50 text-emerald-700";
+                                        }
+                                    } else {
+                                        if (isSelected) {
+                                            style = state.isAnswerCorrect
+                                                ? "border-emerald-500 bg-emerald-100 text-emerald-800"
+                                                : "border-red-500 bg-red-100 text-red-800";
+                                        }
+                                    }
+                                } else if (isSelected) {
+                                    if (multi) {
+                                        style = "border-sky-400 bg-sky-100 text-sky-800";
+                                    } else {
+                                        style = "border-emerald-500 bg-emerald-100 text-emerald-800";
+                                    }
+                                }
+
+                                return `<button onclick="handleAnswer('${opt.replace(/'/g, "\\'")}')" 
+                                            class="p-5 text-left border-2 rounded-xl font-bold transition-all ${style}">
+                                            ${opt}
+                                        </button>`;
+                            }).join('')}
+                        </div>
+
+                        ${multi && state.isAnswerCorrect === null ? `
+                            <button onclick="checkMultiAnswer()" 
+                                class="mt-6 w-full py-4 rounded-xl font-bold transition-all
+                                ${selected.length === q.maxSelect 
+                                    ? 'bg-sky-600 text-white hover:bg-sky-700' 
+                                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'}"
+                                ${selected.length !== q.maxSelect ? 'disabled' : ''}>
+                                Comprobar respuesta (${selected.length}/${q.maxSelect})
+                            </button>
+                        ` : ''}
+
+                        ${state.selectedAnswer !== null && state.isAnswerCorrect === false ? `
+                            <div class="mt-6 p-5 bg-amber-50 border border-amber-200 rounded-xl">
+                                <p class="font-bold text-amber-800 mb-2">Explicación:</p>
+                                <p class="text-slate-700">${q.explanation}</p>
+                            </div>
+                            <button onclick="nextQuestion()" class="mt-6 w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all">
+                                Siguiente pregunta
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>`;
+            }
+
+            if (state.view === 'results') {
+                const scorePerc = Math.round((state.score / state.activeQuestions.length) * 100);
+                app.innerHTML = `
+                <div class="max-w-md mx-auto text-center animate-fade-in bg-white p-12 rounded-[3rem] shadow-2xl">
+                    <h2 class="text-2xl font-black mb-2">${state.studentName}</h2>
+                    <p class="text-slate-400 uppercase text-xs font-bold mb-6">${state.currentMode}</p>
+                    <div class="text-7xl font-black text-emerald-600 mb-4">${scorePerc}%</div>
+                    <p class="text-lg font-bold text-slate-700 mb-10">${state.score} / ${state.activeQuestions.length} correctas</p>
+                    <button onclick="location.reload()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold">VOLVER AL INICIO</button>
+                    <p class="mt-6 text-xs font-bold text-slate-400">
+                        ${state.emailStatus === 'success' ? '✅ Nota e imagen enviadas al correo' :
+                          state.emailStatus === 'error' ? '⚠️ Error al enviar nota e imagen' :
+                          '⏳ Enviando nota e imagen al correo...'}
+                    </p>
+                </div>`;
+            }
+        }
+        render();
+    </script>
+</body>
+</html>
+
